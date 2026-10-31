@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Berita Desa Gunungsari - AI Generator</title>
+    <title>Portal Desa - Generator Berita Desa Gunungsari dengan AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -16,28 +16,19 @@
             font-family: 'Merriweather', serif;
         }
         
-        /* Custom scrollbar for a cleaner look */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8; 
-        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
 
         .loader {
             border: 3px solid #f3f3f3;
             border-radius: 50%;
-            border-top: 3px solid #3b82f6;
-            width: 24px;
-            height: 24px;
-            -webkit-animation: spin 1s linear infinite; /* Safari */
+            border-top: 3px solid #ca8a04; /* Yellow to match theme */
+            width: 20px;
+            height: 20px;
+            -webkit-animation: spin 1s linear infinite;
             animation: spin 1s linear infinite;
         }
         @keyframes spin {
@@ -46,11 +37,11 @@
         }
     </style>
 </head>
-<body class="h-screen flex overflow-hidden text-gray-800">
+<body class="h-screen flex flex-col md:flex-row overflow-hidden text-gray-800">
 
-    <!-- Sidebar / Input Area -->
-    <aside class="w-full md:w-1/3 lg:w-96 bg-white shadow-xl flex flex-col z-10 overflow-y-auto">
-        <div class="p-6 border-b border-gray-100 bg-green-600 text-white">
+    <!-- Sisi Kiri (Form) -->
+    <aside class="w-full md:w-1/3 lg:w-96 bg-white shadow-xl flex flex-col z-10 h-full overflow-y-auto">
+        <div class="p-6 border-b border-gray-100 bg-green-700 text-white">
             <h1 class="text-2xl font-bold flex items-center gap-2">
                 <i class="ph ph-newspaper text-3xl"></i>
                 Portal Desa
@@ -58,30 +49,30 @@
             <p class="text-green-100 text-sm mt-1">Generator Berita Desa Gunungsari dengan AI.</p>
         </div>
 
-        <div class="p-6 flex-1 flex flex-col gap-6">
-            <!-- Alert Box (Hidden by default) -->
+        <div class="p-6 flex-1 flex flex-col gap-5">
+            <!-- Alert Box -->
             <div id="alertBox" class="hidden rounded-md bg-red-50 p-4 border border-red-200">
-                <div class="flex">
+                <div class="flex items-start">
                     <div class="flex-shrink-0">
-                        <i class="ph ph-warning-circle text-red-400 text-xl"></i>
+                        <i class="ph ph-warning-circle text-red-500 text-xl"></i>
                     </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800" id="alertMessage">Pesan Error</h3>
+                    <div class="ml-3 w-full">
+                        <h3 class="text-sm font-medium text-red-800 break-words" id="alertMessage">Pesan Error</h3>
                     </div>
                 </div>
             </div>
 
             <!-- API Key Input -->
             <div>
-                <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-2">Kunci API Gemini</label>
-                <input type="password" id="apiKey" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" placeholder="Masukkan API Key...">
+                <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-1">Kunci API Gemini</label>
+                <input type="password" id="apiKey" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all" placeholder="AIzaSy...">
                 <p class="text-xs text-gray-500 mt-1">Tersimpan otomatis di browser (localStorage).</p>
             </div>
 
             <!-- Keywords Input -->
             <div>
-                <label for="keywords" class="block text-sm font-medium text-gray-700 mb-2">Kata Kunci atau Topik Berita</label>
-                <textarea id="keywords" rows="4" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none resize-none" placeholder="Contoh: Pembangunan jalan desa, hasil panen warga, kegiatan posyandu terbaru..."></textarea>
+                <label for="keywords" class="block text-sm font-medium text-gray-700 mb-1">Kata Kunci atau Topik Berita</label>
+                <textarea id="keywords" rows="4" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none resize-none" placeholder="Contoh: Kegiatan rapat mingguan pemdes, gotong royong warga..."></textarea>
             </div>
 
             <!-- Image Source Selection -->
@@ -90,11 +81,11 @@
                 <div class="flex gap-4 mb-3">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="imgSource" value="upload" checked class="text-green-600 focus:ring-green-500 h-4 w-4">
-                        <span class="text-sm font-medium text-gray-700">Upload Foto</span>
+                        <span class="text-sm text-gray-700">Upload Foto</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="imgSource" value="url" class="text-green-600 focus:ring-green-500 h-4 w-4">
-                        <span class="text-sm font-medium text-gray-700">URL Gambar</span>
+                        <span class="text-sm text-gray-700">URL Gambar</span>
                     </label>
                 </div>
 
@@ -103,110 +94,108 @@
                 </div>
 
                 <div id="urlWrapper" class="hidden">
-                    <input type="text" id="imageUrl" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" placeholder="https://contoh.com/gambar-desa.jpg">
-                    <p class="text-xs text-gray-500 mt-1">Masukkan tautan langsung ke gambar.</p>
+                    <input type="text" id="imageUrl" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" placeholder="https://...">
                 </div>
             </div>
             
             <!-- Tone Selection -->
             <div>
-                <label for="tone" class="block text-sm font-medium text-gray-700 mb-2">Gaya Bahasa Artikel</label>
-                <select id="tone" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none bg-white">
-                    <option value="Informatif & Profesional (Standar Berita Pers)">Informatif & Profesional (Standar Berita Pers)</option>
+                <label for="tone" class="block text-sm font-medium text-gray-700 mb-1">Gaya Bahasa Artikel</label>
+                <select id="tone" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none bg-white">
+                    <option value="Informatif & Profesional (Berita Pers)">Informatif & Profesional (Berita Pers)</option>
                     <option value="Santai & Akrab (Kegiatan Warga)">Santai & Akrab (Kegiatan Warga)</option>
                 </select>
             </div>
         </div>
 
         <div class="p-6 border-t border-gray-100 bg-gray-50">
-            <button id="generateBtn" class="w-full flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-yellow-950 font-bold py-3 px-4 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-70 disabled:cursor-not-allowed">
-                <i class="ph ph-magic-wand text-xl"></i>
-                <span id="btnText">Buat Berita dengan AI</span>
-                <div id="btnLoader" class="loader hidden ml-2 border-t-yellow-950"></div>
+            <button id="generateBtn" class="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold py-3 px-4 rounded-lg shadow transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-75 disabled:cursor-not-allowed">
+                <i class="ph ph-magic-wand text-xl" id="btnIcon"></i>
+                <div id="btnLoader" class="loader hidden"></div>
+                <span id="btnText">Buat Berita Otomatis</span>
             </button>
         </div>
     </aside>
 
-    <!-- Main Content / Generated Article -->
-    <main class="flex-1 overflow-y-auto bg-gray-100 p-4 sm:p-8 lg:p-12">
-        <div id="welcomeScreen" class="h-full flex flex-col items-center justify-center text-gray-400">
+    <!-- Sisi Kanan (Hasil Berita) -->
+    <main class="flex-1 h-full overflow-y-auto bg-gray-100 p-4 sm:p-8 lg:p-12 relative">
+        <!-- Placeholder Screen -->
+        <div id="welcomeScreen" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 transition-opacity duration-300">
             <i class="ph ph-newspaper-clipping text-6xl mb-4 text-gray-300"></i>
             <h2 class="text-xl font-medium text-gray-500">Hasil Berita Akan Muncul Di Sini</h2>
-            <p class="text-sm mt-2 text-center max-w-md">Masukkan topik atau kata kunci di panel sebelah kiri, lalu klik "Buat Berita Otomatis" untuk menghasilkan artikel desa yang profesional.</p>
+            <p class="text-sm mt-2 text-center max-w-md px-4">Lengkapi form di sebelah kiri dan klik "Buat Berita Otomatis".</p>
         </div>
 
         <!-- Article Container -->
         <article id="articleContainer" class="hidden max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <!-- Article Header Image (if provided) -->
+            <!-- Image Header -->
             <div id="articleImageContainer" class="w-full h-64 sm:h-80 bg-gray-200 hidden relative">
-                <img id="articleImage" src="" alt="Gambar Berita" class="w-full h-full object-cover">
-                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                    <p class="text-white/80 text-xs font-medium uppercase tracking-wider" id="articleCategory">Kabar Desa Gunungsari</p>
+                <img id="articleImage" src="" alt="Cover Berita" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                    <p class="text-yellow-400 text-xs font-bold uppercase tracking-wider">Desa Gunungsari</p>
                 </div>
             </div>
 
-            <div class="p-8 sm:p-10">
+            <div class="p-6 sm:p-10">
                 <!-- Meta Info -->
-                <div class="flex items-center text-sm text-gray-500 uppercase tracking-wide font-semibold mb-4 gap-4">
-                    <span id="articleDate">31 Okt 2026</span>
-                    <span class="flex items-center gap-1"><i class="ph ph-clock"></i> <span id="readTime">3 mnt baca</span></span>
+                <div class="flex items-center text-sm text-green-700 uppercase tracking-wide font-bold mb-4 gap-4">
+                    <span id="articleDate">Tanggal</span>
+                    <span class="text-gray-300">|</span>
+                    <span class="flex items-center gap-1 text-gray-500"><i class="ph ph-clock"></i> <span id="readTime">5 mnt baca</span></span>
                 </div>
 
-                <!-- Titles -->
+                <!-- Headline -->
                 <h1 id="articleHeadline" class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4">
-                    Judul berita akan tampil di sini
+                    Judul
                 </h1>
-                <h2 id="articleSubheadline" class="text-xl sm:text-2xl text-gray-600 font-medium leading-relaxed mb-6 border-b border-gray-100 pb-6">
-                    Ringkasan berita akan tampil di sini
+                
+                <!-- Subheadline -->
+                <h2 id="articleSubheadline" class="text-lg sm:text-xl text-gray-600 font-medium leading-relaxed mb-6 pb-6 border-b border-gray-100">
+                    Ringkasan
                 </h2>
 
                 <!-- Author -->
                 <div class="flex items-center gap-3 mb-8">
                     <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-lg">
-                        <i class="ph ph-user"></i>
+                        <i class="ph ph-pen-nib"></i>
                     </div>
                     <div>
-                        <p class="text-gray-900 font-semibold text-sm" id="articleAuthor">Oleh Admin Desa</p>
-                        <p class="text-gray-500 text-xs">Portal Berita Gunungsari</p>
+                        <p class="text-gray-900 font-bold text-sm" id="articleAuthor">Penulis</p>
+                        <p class="text-gray-500 text-xs">Jurnalis Desa</p>
                     </div>
                 </div>
 
-                <!-- Content -->
+                <!-- Content Body -->
                 <div id="articleContent" class="font-serif text-gray-800 text-lg leading-relaxed space-y-6">
-                    <!-- Paragraphs will be injected here -->
+                    <!-- Paragraf HTML akan di-inject ke sini -->
                 </div>
                 
                 <div class="mt-12 pt-6 border-t border-gray-100 flex justify-between items-center">
-                    <div class="flex gap-2">
-                        <button onclick="copyToClipboard()" class="text-sm flex items-center gap-1 text-gray-500 hover:text-green-600 transition-colors">
-                            <i class="ph ph-copy"></i> Salin Teks
-                        </button>
-                    </div>
-                    <div class="text-xs text-gray-400">
-                        Dibuat oleh AI Generator Desa
-                    </div>
+                    <p class="text-xs text-gray-400 italic">Dihasilkan secara otomatis oleh AI Portal Desa.</p>
                 </div>
             </div>
         </article>
     </main>
 
+    <!-- JavaScript Logika -->
     <script>
-        // --- DOM Elements ---
+        // DOM Elements
         const apiKeyInput = document.getElementById('apiKey');
         const keywordsInput = document.getElementById('keywords');
-        const imageUrlInput = document.getElementById('imageUrl');
-        const imageUploadInput = document.getElementById('imageUpload');
         const imgSourceRadios = document.getElementsByName('imgSource');
         const uploadWrapper = document.getElementById('uploadWrapper');
         const urlWrapper = document.getElementById('urlWrapper');
+        const imageUploadInput = document.getElementById('imageUpload');
+        const imageUrlInput = document.getElementById('imageUrl');
         const toneSelect = document.getElementById('tone');
         const generateBtn = document.getElementById('generateBtn');
         const btnText = document.getElementById('btnText');
+        const btnIcon = document.getElementById('btnIcon');
         const btnLoader = document.getElementById('btnLoader');
+        
         const alertBox = document.getElementById('alertBox');
         const alertMessage = document.getElementById('alertMessage');
         
-        // Article Elements
         const welcomeScreen = document.getElementById('welcomeScreen');
         const articleContainer = document.getElementById('articleContainer');
         const articleImageContainer = document.getElementById('articleImageContainer');
@@ -217,15 +206,13 @@
         const articleContent = document.getElementById('articleContent');
         const articleDate = document.getElementById('articleDate');
 
-        // Load API Key from LocalStorage on Startup
+        // Init: Load API Key from localStorage
         document.addEventListener('DOMContentLoaded', () => {
             const savedKey = localStorage.getItem('gemini_api_key_gunungsari');
-            if (savedKey) {
-                apiKeyInput.value = savedKey;
-            }
+            if (savedKey) apiKeyInput.value = savedKey;
         });
 
-        // Toggle Image Source Input
+        // Toggle Image Source UI
         imgSourceRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 if(e.target.value === 'upload') {
@@ -238,221 +225,203 @@
             });
         });
 
-        // Convert File to Base64
+        // Helper: Convert File to Base64
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = () => {
-                    // Hanya ambil data base64 tanpa prefix (data:image/jpeg;base64,)
-                    const base64String = reader.result.split(',')[1];
-                    resolve(base64String);
-                };
+                reader.onload = () => resolve(reader.result.split(',')[1]);
                 reader.onerror = error => reject(error);
             });
         }
 
-        // Generate Button Click
+        // Helper: Alert UI
+        function showError(msg) {
+            alertMessage.textContent = msg;
+            alertBox.classList.remove('hidden');
+        }
+        function hideError() {
+            alertBox.classList.add('hidden');
+        }
+
+        // Helper: Button Loading State
+        function setLoading(isLoading) {
+            generateBtn.disabled = isLoading;
+            if (isLoading) {
+                btnText.textContent = "Memproses...";
+                btnIcon.classList.add('hidden');
+                btnLoader.classList.remove('hidden');
+            } else {
+                btnText.textContent = "Buat Berita Otomatis";
+                btnIcon.classList.remove('hidden');
+                btnLoader.classList.add('hidden');
+            }
+        }
+
+        // Main Logic: Generate Button Click
         generateBtn.addEventListener('click', async () => {
-            const currentApiKey = apiKeyInput.value.trim();
+            hideError();
+            
+            const apiKey = apiKeyInput.value.trim();
             const keywords = keywordsInput.value.trim();
             const tone = toneSelect.value;
-
-            if (!currentApiKey) {
-                showAlert('Mohon masukkan Kunci API Gemini.');
-                return;
-            }
-            if (!keywords) {
-                showAlert('Mohon masukkan kata kunci atau topik berita.');
-                return;
-            }
-
-            // Simpan API Key ke localStorage
-            localStorage.setItem('gemini_api_key_gunungsari', currentApiKey);
-
-            hideAlert();
-            setLoading(true);
-
-            let finalImageUrl = "";
-            let base64Data = null;
-            let mimeType = null;
             const sourceType = document.querySelector('input[name="imgSource"]:checked').value;
 
+            // Validasi Input
+            if (!apiKey) return showError('Gagal: Kunci API Gemini tidak boleh kosong.');
+            if (!keywords) return showError('Gagal: Kata kunci atau topik berita harus diisi.');
+
+            // Simpan API Key ke localStorage
+            localStorage.setItem('gemini_api_key_gunungsari', apiKey);
+
+            setLoading(true);
+
             try {
-                // Proses Gambar Jika Ada
+                let finalImageUrl = "";
+                let base64Data = null;
+                let mimeType = null;
+
+                // Tangani Gambar
                 if (sourceType === 'upload' && imageUploadInput.files.length > 0) {
                     const file = imageUploadInput.files[0];
                     mimeType = file.type;
                     base64Data = await fileToBase64(file);
-                    finalImageUrl = URL.createObjectURL(file); // Untuk preview gambar lokal
-                } else if (sourceType === 'url') {
+                    finalImageUrl = URL.createObjectURL(file); // Preview lokal
+                } else if (sourceType === 'url' && imageUrlInput.value.trim() !== '') {
                     finalImageUrl = imageUrlInput.value.trim();
                 }
 
-                const articleData = await generateArticle(keywords, tone, base64Data, mimeType, currentApiKey);
-                if (articleData) {
-                    displayArticle(articleData, finalImageUrl);
+                // Susun Prompt Sistem
+                const promptText = `Anda adalah Humas/Jurnalis Profesional dari Desa Gunungsari.
+Tugas Anda: Buat berita atau siaran pers berstandar jurnalistik berdasarkan kata kunci berikut: "${keywords}".
+Gaya bahasa yang digunakan: ${tone}.
+
+Syarat Wajib:
+1. Kembalikan HANYA format JSON murni.
+2. Jangan gunakan awalan markdown seperti \`\`\`json atau akhiran \`\`\`. 
+3. Gunakan struktur JSON persis seperti ini:
+{
+  "judul": "Judul Berita (Maksimal 10 Kata)",
+  "ringkasan": "Ringkasan padat satu kalimat",
+  "penulis": "Nama/Jabatan Penulis",
+  "tanggal": "Contoh: 31 Oktober 2026",
+  "konten": ["<p>Paragraf pertama...</p>", "<p>Paragraf kedua...</p>"]
+}
+Catatan: 'konten' adalah array of strings di mana setiap elemen adalah satu paragraf yang sudah dibungkus tag HTML <p>.`;
+
+                // Setup Payload
+                let parts = [{ text: promptText }];
+                if (base64Data) {
+                    parts.push({
+                        inlineData: { mimeType: mimeType, data: base64Data }
+                    });
                 }
+
+                const payload = {
+                    contents: [{ role: "user", parts: parts }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        responseMimeType: "application/json" // Memaksa AI mengembalikan JSON
+                    }
+                };
+
+                // Fetch ke API Gemini 1.5 Pro
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                // Tangani Response Error dari Google
+                if (!response.ok) {
+                    let errMsg = data.error?.message || response.statusText;
+                    throw new Error(`API Error (${response.status}): ${errMsg}`);
+                }
+
+                if (data.candidates && data.candidates.length > 0) {
+                    let textResponse = data.candidates[0].content.parts[0].text;
+                    
+                    // Bersihkan backtick markdown jika AI tetap membandel
+                    textResponse = textResponse.trim();
+                    textResponse = textResponse.replace(/^```json/i, '').replace(/^```/, '').replace(/```$/, '').trim();
+
+                    // Parse JSON
+                    let articleData;
+                    try {
+                        articleData = JSON.parse(textResponse);
+                    } catch (parseErr) {
+                        console.log("Raw Response:", textResponse);
+                        throw new Error("Gagal memproses JSON dari AI. Format tidak sesuai.");
+                    }
+
+                    // Tampilkan Hasil
+                    renderArticle(articleData, finalImageUrl);
+                } else {
+                    throw new Error("AI tidak mengembalikan teks apapun.");
+                }
+
             } catch (error) {
-                console.error("Generation Error:", error);
-                showAlert(`Gagal: ${error.message}`);
+                console.error("Terjadi Kesalahan:", error);
+                showError(error.message);
             } finally {
                 setLoading(false);
             }
         });
 
-        // --- Core Logic ---
-
-        function showAlert(msg) {
-            alertMessage.textContent = msg;
-            alertBox.classList.remove('hidden');
-        }
-
-        function hideAlert() {
-            alertBox.classList.add('hidden');
-        }
-
-        function setLoading(isLoading) {
-            generateBtn.disabled = isLoading;
-            if (isLoading) {
-                btnText.textContent = "Memproses...";
-                btnLoader.classList.remove('hidden');
-            } else {
-                btnText.textContent = "Buat Berita Otomatis";
-                btnLoader.classList.add('hidden');
-            }
-        }
-
-        // Exponential backoff fetch helper
-        async function fetchWithRetry(url, options, maxRetries = 3) {
-            let retries = 0;
-            while (retries < maxRetries) {
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) {
-                        let errorMsg = `HTTP error! status: ${response.status}`;
-                        try {
-                            // Coba ekstrak pesan error dari JSON balasan Gemini API
-                            const errData = await response.json();
-                            if (errData && errData.error && errData.error.message) {
-                                errorMsg = errData.error.message;
-                            }
-                        } catch(e) {
-                            // Abaikan jika respons bukan JSON
-                        }
-
-                        if (response.status === 429) {
-                            throw new Error('Terlalu banyak permintaan (Rate limited). Tunggu beberapa saat lalu coba lagi.');
-                        } else if (response.status === 400) {
-                            throw new Error(`Permintaan tidak valid (400): ${errorMsg}`);
-                        } else if (response.status === 403) {
-                            throw new Error(`Akses ditolak (403). Periksa kembali API Key Anda. Detail: ${errorMsg}`);
-                        }
-                        
-                        throw new Error(errorMsg);
-                    }
-                    return await response.json();
-                } catch (error) {
-                    retries++;
-                    // Jangan retry untuk error autentikasi (403) atau bad request (400)
-                    if (retries >= maxRetries || error.message.includes('Akses ditolak') || error.message.includes('Permintaan tidak valid')) {
-                        throw error;
-                    }
-                    const delay = Math.pow(2, retries - 1) * 1000;
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                }
-            }
-        }
-
-        async function generateArticle(keywords, tone, base64Data, mimeType, apiKey) {
-            // Menggunakan Gemini 1.5 Flash Latest sesuai instruksi untuk mengatasi error "not found"
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
-            
-            // Build Prompt presisi
-            let promptText = `Anda adalah Humas/Jurnalis Profesional Desa Gunungsari, Kecamatan Cikatomas, Kabupaten Tasikmalaya. Buat berita atau siaran pers resmi berstandar 5W1H dari kata kunci: ${keywords}. Gaya bahasa: ${tone}. Kembalikan HANYA dalam format JSON mentah persis dengan struktur ini: {"judul": "Judul Berita...", "ringkasan": "Ringkasan...", "penulis": "Humas Desa Gunungsari", "tanggal": "Tanggal hari ini", "konten": ["Paragraf 1...", "Paragraf 2...", "Paragraf 3..."]}. Pastikan bagian 'konten' adalah array berisi string. Jangan beri format markdown \`\`\`json.`;
-
-            // Setup Payload Content (Multimodal if image exists)
-            let parts = [{ text: promptText }];
-            if (base64Data) {
-                parts.push({
-                    inlineData: {
-                        mimeType: mimeType,
-                        data: base64Data
-                    }
-                });
-            }
-
-            const payload = {
-                contents: [{ role: "user", parts: parts }],
-                generationConfig: {
-                    responseMimeType: "application/json"
-                }
-            };
-
-            const result = await fetchWithRetry(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (result.candidates && result.candidates.length > 0) {
-                let textResponse = result.candidates[0].content.parts[0].text;
-                try {
-                    // Bersihkan jika AI membandel masih mengirimkan markdown
-                    textResponse = textResponse.trim();
-                    if (textResponse.startsWith('```json')) {
-                        textResponse = textResponse.replace(/^```json\n/, '').replace(/\n```$/, '');
-                    } else if (textResponse.startsWith('```')) {
-                        textResponse = textResponse.replace(/^```\n/, '').replace(/\n```$/, '');
-                    }
-                    
-                    return JSON.parse(textResponse);
-                } catch (e) {
-                    console.error("Failed to parse JSON response:", textResponse);
-                    throw new Error("Format JSON tidak valid dari server AI.");
-                }
-            } else {
-                throw new Error("Tidak ada output yang dihasilkan.");
-            }
-        }
-
-        function displayArticle(data, imageUrl) {
-            // Hide welcome, show article
+        // Tampilkan data ke DOM (Sisi Kanan)
+        function renderArticle(data, imageUrl) {
             welcomeScreen.classList.add('hidden');
             articleContainer.classList.remove('hidden');
 
-            // Populate text fields from JSON structure
-            articleHeadline.textContent = data.judul;
-            articleSubheadline.textContent = data.ringkasan;
-            articleAuthor.textContent = `Oleh ${data.penulis}`;
-            articleDate.textContent = data.tanggal;
+            articleHeadline.textContent = data.judul || "Tanpa Judul";
+            articleSubheadline.textContent = data.ringkasan || "";
+            articleAuthor.textContent = data.penulis || "Humas Desa Gunungsari";
+            articleDate.textContent = data.tanggal || new Date().toLocaleDateString('id-ID');
 
-            // Populate Content Array
-            articleContent.innerHTML = '';
-            let wordCount = 0;
-            data.konten.forEach((paragraph, index) => {
-                const p = document.createElement('p');
-                p.textContent = paragraph;
-                
-                // Add drop cap for the first paragraph for aesthetics
-                if (index === 0) {
-                    p.innerHTML = `<span class="float-left text-5xl font-bold leading-none pr-2 pt-1 text-gray-900">${paragraph.charAt(0)}</span>${paragraph.slice(1)}`;
-                }
-                
-                articleContent.appendChild(p);
-                wordCount += paragraph.split(' ').length;
-            });
+            // Susun Konten (Data sudah berupa array of string dgn tag HTML <p>)
+            articleContent.innerHTML = "";
+            let textLength = 0;
 
-            // Estimate read time (avg 200 words per min)
-            const minutes = Math.max(1, Math.ceil(wordCount / 200));
+            if(Array.isArray(data.konten)) {
+                data.konten.forEach((paragraph, index) => {
+                    // Jika AI tidak memberikan tag <p>, bungkus otomatis
+                    if (!paragraph.trim().startsWith('<p>')) {
+                        paragraph = `<p>${paragraph}</p>`;
+                    }
+                    
+                    // Drop cap untuk estetika di paragraf pertama
+                    if (index === 0) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = paragraph;
+                        let firstText = tempDiv.textContent || tempDiv.innerText || "";
+                        if (firstText.length > 0) {
+                            const firstChar = firstText.charAt(0);
+                            const restOfText = tempDiv.innerHTML.substring(1); // Cukup aman jika tidak ada tag kompleks di awal
+                            paragraph = `<p><span class="float-left text-5xl font-bold leading-none pr-2 pt-1 text-green-800">${firstChar}</span>${restOfText}</p>`;
+                        }
+                    }
+                    
+                    articleContent.innerHTML += paragraph;
+                    textLength += paragraph.split(' ').length;
+                });
+            } else if (typeof data.konten === 'string') {
+                articleContent.innerHTML = data.konten;
+                textLength += data.konten.split(' ').length;
+            }
+
+            // Estimasi waktu baca
+            const minutes = Math.max(1, Math.ceil(textLength / 200));
             document.getElementById('readTime').textContent = `${minutes} mnt baca`;
 
-            // Handle Image display from URL
+            // Tangani Gambar Cover
             if (imageUrl) {
                 articleImage.src = imageUrl;
                 articleImageContainer.classList.remove('hidden');
                 
-                // Fallback in case the external image URL is broken/forbidden
                 articleImage.onerror = () => {
                     articleImageContainer.classList.add('hidden');
                 };
@@ -460,56 +429,8 @@
                 articleImageContainer.classList.add('hidden');
             }
 
-            // Scroll to top of main area
+            // Scroll otomatis ke atas
             document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Utility: Copy to Clipboard
-        function copyToClipboard() {
-            const headline = articleHeadline.textContent;
-            const sub = articleSubheadline.textContent;
-            
-            let body = '';
-            const paragraphs = articleContent.querySelectorAll('p');
-            paragraphs.forEach(p => {
-                body += p.innerText + '\n\n';
-            });
-
-            const fullText = `${headline}\n${sub}\n\n${body}`;
-
-            try {
-                if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(fullText).then(() => {
-                        showCopyToast();
-                    });
-                } else {
-                    let textArea = document.createElement("textarea");
-                    textArea.value = fullText;
-                    textArea.style.position = "fixed";
-                    textArea.style.left = "-999999px";
-                    textArea.style.top = "-999999px";
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    document.execCommand('copy');
-                    textArea.remove();
-                    showCopyToast();
-                }
-            } catch (err) {
-                console.error('Gagal menyalin:', err);
-            }
-        }
-
-        function showCopyToast() {
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300 flex items-center gap-2 z-50';
-            toast.innerHTML = '<i class="ph ph-check-circle text-green-400"></i> Berhasil disalin ke clipboard!';
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 2000);
         }
     </script>
 </body>
