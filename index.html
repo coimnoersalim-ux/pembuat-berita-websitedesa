@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Berita Desa Gunungsari - AI Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .font-serif {
+            font-family: 'Merriweather', serif;
+        }
+        
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8; 
+        }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #3b82f6;
+            width: 24px;
+            height: 24px;
+            -webkit-animation: spin 1s linear infinite; /* Safari */
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden text-gray-800">
+
+    <!-- Sidebar / Input Area -->
+    <aside class="w-full md:w-1/3 lg:w-96 bg-white shadow-xl flex flex-col z-10 overflow-y-auto">
+        <div class="p-6 border-b border-gray-100 bg-green-600 text-white">
+            <h1 class="text-2xl font-bold flex items-center gap-2">
+                <i class="ph ph-newspaper text-3xl"></i>
+                Portal Desa
+            </h1>
+            <p class="text-green-100 text-sm mt-1">Generator Berita Desa Gunungsari dengan AI.</p>
+        </div>
+
+        <div class="p-6 flex-1 flex flex-col gap-6">
+            <!-- Alert Box (Hidden by default) -->
+            <div id="alertBox" class="hidden rounded-md bg-red-50 p-4 border border-red-200">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="ph ph-warning-circle text-red-400 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800" id="alertMessage">Pesan Error</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Keywords Input -->
+            <div>
+                <label for="keywords" class="block text-sm font-medium text-gray-700 mb-2">Kata Kunci atau Topik Berita</label>
+                <textarea id="keywords" rows="4" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none resize-none" placeholder="Contoh: Pembangunan jalan desa, hasil panen warga, kegiatan posyandu terbaru..."></textarea>
+            </div>
+
+            <!-- Image Source Selection -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Sumber Gambar (Opsional)</label>
+                <div class="flex gap-4 mb-3">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="imgSource" value="upload" checked class="text-green-600 focus:ring-green-500 h-4 w-4">
+                        <span class="text-sm font-medium text-gray-700">Upload Foto</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="imgSource" value="url" class="text-green-600 focus:ring-green-500 h-4 w-4">
+                        <span class="text-sm font-medium text-gray-700">URL Gambar</span>
+                    </label>
+                </div>
+
+                <div id="uploadWrapper">
+                    <input type="file" id="imageUpload" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-yellow-100 file:text-yellow-800 hover:file:bg-yellow-200 focus:outline-none cursor-pointer">
+                </div>
+
+                <div id="urlWrapper" class="hidden">
+                    <input type="text" id="imageUrl" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" placeholder="https://contoh.com/gambar-desa.jpg">
+                    <p class="text-xs text-gray-500 mt-1">Masukkan tautan langsung ke gambar.</p>
+                </div>
+            </div>
+            
+            <!-- Tone Selection -->
+            <div>
+                <label for="tone" class="block text-sm font-medium text-gray-700 mb-2">Gaya Bahasa Artikel</label>
+                <select id="tone" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none bg-white">
+                    <option value="informatif dan profesional">Informatif & Profesional (Standar Berita)</option>
+                    <option value="positif dan membangun">Positif & Membangun (Pencapaian Desa)</option>
+                    <option value="santai dan akrab">Santai & Akrab (Kegiatan Warga)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="p-6 border-t border-gray-100 bg-gray-50">
+            <button id="generateBtn" class="w-full flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-yellow-950 font-bold py-3 px-4 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-70 disabled:cursor-not-allowed">
+                <i class="ph ph-magic-wand text-xl"></i>
+                <span id="btnText">Buat Berita dengan AI</span>
+                <div id="btnLoader" class="loader hidden ml-2 border-t-yellow-950"></div>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content / Generated Article -->
+    <main class="flex-1 overflow-y-auto bg-gray-100 p-4 sm:p-8 lg:p-12">
+        <div id="welcomeScreen" class="h-full flex flex-col items-center justify-center text-gray-400">
+            <i class="ph ph-newspaper-clipping text-6xl mb-4 text-gray-300"></i>
+            <h2 class="text-xl font-medium text-gray-500">Hasil Berita Akan Muncul Di Sini</h2>
+            <p class="text-sm mt-2 text-center max-w-md">Masukkan topik atau kata kunci di panel sebelah kiri, lalu klik "Buat Berita Otomatis" untuk menghasilkan artikel desa yang profesional.</p>
+        </div>
+
+        <!-- Article Container -->
+        <article id="articleContainer" class="hidden max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Article Header Image (if provided) -->
+            <div id="articleImageContainer" class="w-full h-64 sm:h-80 bg-gray-200 hidden relative">
+                <img id="articleImage" src="" alt="Gambar Berita" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                    <p class="text-white/80 text-xs font-medium uppercase tracking-wider" id="articleCategory">Kabar Desa Gunungsari</p>
+                </div>
+            </div>
+
+            <div class="p-8 sm:p-10">
+                <!-- Meta Info -->
+                <div class="flex items-center text-sm text-gray-500 uppercase tracking-wide font-semibold mb-4 gap-4">
+                    <span id="articleDate">31 Okt 2026</span>
+                    <span class="flex items-center gap-1"><i class="ph ph-clock"></i> <span id="readTime">3 mnt baca</span></span>
+                </div>
+
+                <!-- Titles -->
+                <h1 id="articleHeadline" class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4">
+                    Judul berita akan tampil di sini
+                </h1>
+                <h2 id="articleSubheadline" class="text-xl sm:text-2xl text-gray-600 font-medium leading-relaxed mb-6 border-b border-gray-100 pb-6">
+                    Ringkasan berita akan tampil di sini
+                </h2>
+
+                <!-- Author -->
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-lg">
+                        <i class="ph ph-user"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-900 font-semibold text-sm" id="articleAuthor">Oleh Admin Desa</p>
+                        <p class="text-gray-500 text-xs">Portal Berita Gunungsari</p>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div id="articleContent" class="font-serif text-gray-800 text-lg leading-relaxed space-y-6">
+                    <!-- Paragraphs will be injected here -->
+                </div>
+                
+                <div class="mt-12 pt-6 border-t border-gray-100 flex justify-between items-center">
+                    <div class="flex gap-2">
+                        <button onclick="copyToClipboard()" class="text-sm flex items-center gap-1 text-gray-500 hover:text-green-600 transition-colors">
+                            <i class="ph ph-copy"></i> Salin Teks
+                        </button>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        Dibuat oleh AI Generator Desa
+                    </div>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <script>
+        const apiKey = ""; // Canvas menyediakan ini otomatis
+
+        // --- DOM Elements ---
+        const keywordsInput = document.getElementById('keywords');
+        const imageUrlInput = document.getElementById('imageUrl');
+        const imageUploadInput = document.getElementById('imageUpload');
+        const imgSourceRadios = document.getElementsByName('imgSource');
+        const uploadWrapper = document.getElementById('uploadWrapper');
+        const urlWrapper = document.getElementById('urlWrapper');
+        const toneSelect = document.getElementById('tone');
+        const generateBtn = document.getElementById('generateBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+        const alertBox = document.getElementById('alertBox');
+        const alertMessage = document.getElementById('alertMessage');
+        
+        // Article Elements
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const articleContainer = document.getElementById('articleContainer');
+        const articleImageContainer = document.getElementById('articleImageContainer');
+        const articleImage = document.getElementById('articleImage');
+        const articleHeadline = document.getElementById('articleHeadline');
+        const articleSubheadline = document.getElementById('articleSubheadline');
+        const articleAuthor = document.getElementById('articleAuthor');
+        const articleContent = document.getElementById('articleContent');
+        const articleDate = document.getElementById('articleDate');
+
+        // Toggle Image Source Input
+        imgSourceRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if(e.target.value === 'upload') {
+                    uploadWrapper.classList.remove('hidden');
+                    urlWrapper.classList.add('hidden');
+                } else {
+                    uploadWrapper.classList.add('hidden');
+                    urlWrapper.classList.remove('hidden');
+                }
+            });
+        });
+
+        // Convert File to Base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    // Hanya ambil data base64 tanpa prefix (data:image/jpeg;base64,)
+                    const base64String = reader.result.split(',')[1];
+                    resolve(base64String);
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Generate Button Click
+        generateBtn.addEventListener('click', async () => {
+            const keywords = keywordsInput.value.trim();
+            const tone = toneSelect.value;
+            
+            if (!keywords) {
+                showAlert('Mohon masukkan kata kunci atau topik berita.');
+                return;
+            }
+
+            hideAlert();
+            setLoading(true);
+
+            let finalImageUrl = "";
+            let base64Data = null;
+            let mimeType = null;
+            const sourceType = document.querySelector('input[name="imgSource"]:checked').value;
+
+            try {
+                // Proses Gambar Jika Ada
+                if (sourceType === 'upload' && imageUploadInput.files.length > 0) {
+                    const file = imageUploadInput.files[0];
+                    mimeType = file.type;
+                    base64Data = await fileToBase64(file);
+                    finalImageUrl = URL.createObjectURL(file); // Untuk preview gambar lokal
+                } else if (sourceType === 'url') {
+                    finalImageUrl = imageUrlInput.value.trim();
+                }
+
+                const articleData = await generateArticle(keywords, tone, base64Data, mimeType);
+                if (articleData) {
+                    displayArticle(articleData, finalImageUrl);
+                }
+            } catch (error) {
+                console.error("Generation Error:", error);
+                showAlert('Gagal membuat berita. Silakan periksa kembali jaringan Anda atau coba lagi nanti.');
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // --- Core Logic ---
+
+        function showAlert(msg) {
+            alertMessage.textContent = msg;
+            alertBox.classList.remove('hidden');
+        }
+
+        function hideAlert() {
+            alertBox.classList.add('hidden');
+        }
+
+        function setLoading(isLoading) {
+            generateBtn.disabled = isLoading;
+            if (isLoading) {
+                btnText.textContent = "Memproses...";
+                btnLoader.classList.remove('hidden');
+            } else {
+                btnText.textContent = "Buat Berita Otomatis";
+                btnLoader.classList.add('hidden');
+            }
+        }
+
+        // Exponential backoff fetch helper
+        async function fetchWithRetry(url, options, maxRetries = 3) {
+            let retries = 0;
+            while (retries < maxRetries) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        if (response.status === 429) {
+                            throw new Error('Rate limited');
+                        }
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    retries++;
+                    if (retries >= maxRetries) throw error;
+                    const delay = Math.pow(2, retries - 1) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+        async function generateArticle(keywords, tone, base64Data, mimeType) {
+            // Memanfaatkan Gemini Multimodal
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+            
+            // Build Prompt
+            let promptText = `Anda adalah jurnalis dan penulis konten untuk portal berita web Desa Gunungsari, Kecamatan Cikatomas, Kabupaten Tasikmalaya (https://gunungsari-tasikmalaya.desa.id/). Buatlah artikel berita menggunakan bahasa Indonesia yang baik, rapi, dan profesional.
+Gaya penulisan: ${tone}.
+Topik / Kata kunci dari pengguna: ${keywords}.
+Jika ada gambar terlampir, analisis gambar tersebut dan jadikan fokus utama atau pelengkap cerita berita.
+
+Instruksi Wajib:
+1. Buat "judul" berita yang menarik dan relevan untuk warga/publik desa.
+2. Buat "ringkasan" berita sebagai sub-judul singkat.
+3. Tetapkan "penulis" sebagai "Nursalim (Kasipem)".
+4. Tetapkan "tanggal" dengan format lokal hari ini.
+5. Buat "konten" berisi susunan paragraf artikel (minimal 3 paragraf). Berikan informasi pelengkap yang relevan mengenai Kecamatan Cikatomas / Kab. Tasikmalaya jika dibutuhkan agar berita terasa nyata dan mendalam.
+
+Kembalikan hasil HANYA menggunakan format JSON struktur berikut.`;
+
+            // Setup Payload Content (Multimodal if image exists)
+            let parts = [{ text: promptText }];
+            if (base64Data) {
+                parts.push({
+                    inlineData: {
+                        mimeType: mimeType,
+                        data: base64Data
+                    }
+                });
+            }
+
+            const payload = {
+                contents: [{ role: "user", parts: parts }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            judul: { type: "STRING" },
+                            ringkasan: { type: "STRING" },
+                            penulis: { type: "STRING" },
+                            tanggal: { type: "STRING" },
+                            konten: { 
+                                type: "ARRAY", 
+                                items: { type: "STRING" },
+                                description: "Array string di mana setiap item adalah satu paragraf dari isi berita."
+                            }
+                        },
+                        required: ["judul", "ringkasan", "penulis", "tanggal", "konten"]
+                    }
+                }
+            };
+
+            const result = await fetchWithRetry(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (result.candidates && result.candidates.length > 0) {
+                const textResponse = result.candidates[0].content.parts[0].text;
+                try {
+                    return JSON.parse(textResponse);
+                } catch (e) {
+                    console.error("Failed to parse JSON response:", textResponse);
+                    throw new Error("Format JSON tidak valid");
+                }
+            } else {
+                throw new Error("Tidak ada output yang dihasilkan.");
+            }
+        }
+
+        function displayArticle(data, imageUrl) {
+            // Hide welcome, show article
+            welcomeScreen.classList.add('hidden');
+            articleContainer.classList.remove('hidden');
+
+            // Populate text fields from JSON structure
+            articleHeadline.textContent = data.judul;
+            articleSubheadline.textContent = data.ringkasan;
+            articleAuthor.textContent = `Oleh ${data.penulis}`;
+            articleDate.textContent = data.tanggal;
+
+            // Populate Content Array
+            articleContent.innerHTML = '';
+            let wordCount = 0;
+            data.konten.forEach((paragraph, index) => {
+                const p = document.createElement('p');
+                p.textContent = paragraph;
+                
+                // Add drop cap for the first paragraph for aesthetics
+                if (index === 0) {
+                    p.innerHTML = `<span class="float-left text-5xl font-bold leading-none pr-2 pt-1 text-gray-900">${paragraph.charAt(0)}</span>${paragraph.slice(1)}`;
+                }
+                
+                articleContent.appendChild(p);
+                wordCount += paragraph.split(' ').length;
+            });
+
+            // Estimate read time (avg 200 words per min)
+            const minutes = Math.max(1, Math.ceil(wordCount / 200));
+            document.getElementById('readTime').textContent = `${minutes} mnt baca`;
+
+            // Handle Image display from URL
+            if (imageUrl) {
+                articleImage.src = imageUrl;
+                articleImageContainer.classList.remove('hidden');
+                
+                // Fallback in case the external image URL is broken/forbidden
+                articleImage.onerror = () => {
+                    articleImageContainer.classList.add('hidden');
+                };
+            } else {
+                articleImageContainer.classList.add('hidden');
+            }
+
+            // Scroll to top of main area
+            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Utility: Copy to Clipboard
+        function copyToClipboard() {
+            const headline = articleHeadline.textContent;
+            const sub = articleSubheadline.textContent;
+            
+            let body = '';
+            const paragraphs = articleContent.querySelectorAll('p');
+            paragraphs.forEach(p => {
+                body += p.innerText + '\n\n';
+            });
+
+            const fullText = `${headline}\n${sub}\n\n${body}`;
+
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(fullText).then(() => {
+                        showCopyToast();
+                    });
+                } else {
+                    let textArea = document.createElement("textarea");
+                    textArea.value = fullText;
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-999999px";
+                    textArea.style.top = "-999999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    document.execCommand('copy');
+                    textArea.remove();
+                    showCopyToast();
+                }
+            } catch (err) {
+                console.error('Gagal menyalin:', err);
+            }
+        }
+
+        function showCopyToast() {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300 flex items-center gap-2 z-50';
+            toast.innerHTML = '<i class="ph ph-check-circle text-green-400"></i> Berhasil disalin ke clipboard!';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
