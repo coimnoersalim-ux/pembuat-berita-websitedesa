@@ -112,9 +112,8 @@
             <div>
                 <label for="tone" class="block text-sm font-medium text-gray-700 mb-2">Gaya Bahasa Artikel</label>
                 <select id="tone" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none bg-white">
-                    <option value="Standar Berita Pers">Standar Berita Pers</option>
-                    <option value="Santai/Kegiatan Warga">Santai/Kegiatan Warga</option>
-                    <option value="Laporan Resmi">Laporan Resmi</option>
+                    <option value="Informatif & Profesional (Standar Berita Pers)">Informatif & Profesional (Standar Berita Pers)</option>
+                    <option value="Santai & Akrab (Kegiatan Warga)">Santai & Akrab (Kegiatan Warga)</option>
                 </select>
             </div>
         </div>
@@ -366,11 +365,11 @@
         }
 
         async function generateArticle(keywords, tone, base64Data, mimeType, apiKey) {
-            // Menggunakan Gemini 1.5 Flash sesuai instruksi
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            // Menggunakan Gemini 1.5 Flash Latest sesuai instruksi untuk mengatasi error "not found"
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
             
             // Build Prompt presisi
-            let promptText = `Anda adalah Humas/Jurnalis Profesional Desa Gunungsari, Kecamatan Cikatomas, Kabupaten Tasikmalaya. Buat siaran pers resmi berstandar 5W1H dari kata kunci: ${keywords}. Gaya bahasa: ${tone}. Kembalikan HANYA dalam format JSON persis seperti ini: {"judul": "Judul...", "ringkasan": "Ringkasan...", "penulis": "Humas Desa Gunungsari", "tanggal": "Tanggal hari ini", "konten": ["Paragraf 1...", "Paragraf 2...", "Paragraf 3..."]}. Jangan beri markdown \`\`\`json.`;
+            let promptText = `Anda adalah Humas/Jurnalis Profesional Desa Gunungsari, Kecamatan Cikatomas, Kabupaten Tasikmalaya. Buat berita atau siaran pers resmi berstandar 5W1H dari kata kunci: ${keywords}. Gaya bahasa: ${tone}. Kembalikan HANYA dalam format JSON mentah persis dengan struktur ini: {"judul": "Judul Berita...", "ringkasan": "Ringkasan...", "penulis": "Humas Desa Gunungsari", "tanggal": "Tanggal hari ini", "konten": ["Paragraf 1...", "Paragraf 2...", "Paragraf 3..."]}. Pastikan bagian 'konten' adalah array berisi string. Jangan beri format markdown \`\`\`json.`;
 
             // Setup Payload Content (Multimodal if image exists)
             let parts = [{ text: promptText }];
