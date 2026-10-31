@@ -71,6 +71,13 @@
                 </div>
             </div>
 
+            <!-- API Key Input -->
+            <div>
+                <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-2">Kunci API Gemini</label>
+                <input type="password" id="apiKey" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" placeholder="Masukkan API Key...">
+                <p class="text-xs text-gray-500 mt-1">Tersimpan otomatis di browser (localStorage).</p>
+            </div>
+
             <!-- Keywords Input -->
             <div>
                 <label for="keywords" class="block text-sm font-medium text-gray-700 mb-2">Kata Kunci atau Topik Berita</label>
@@ -105,9 +112,9 @@
             <div>
                 <label for="tone" class="block text-sm font-medium text-gray-700 mb-2">Gaya Bahasa Artikel</label>
                 <select id="tone" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none bg-white">
-                    <option value="informatif dan profesional">Informatif & Profesional (Standar Berita)</option>
-                    <option value="positif dan membangun">Positif & Membangun (Pencapaian Desa)</option>
-                    <option value="santai dan akrab">Santai & Akrab (Kegiatan Warga)</option>
+                    <option value="Standar Berita Pers">Standar Berita Pers</option>
+                    <option value="Santai/Kegiatan Warga">Santai/Kegiatan Warga</option>
+                    <option value="Laporan Resmi">Laporan Resmi</option>
                 </select>
             </div>
         </div>
@@ -186,6 +193,7 @@
 
     <script>
         // --- DOM Elements ---
+        const apiKeyInput = document.getElementById('apiKey');
         const keywordsInput = document.getElementById('keywords');
         const imageUrlInput = document.getElementById('imageUrl');
         const imageUploadInput = document.getElementById('imageUpload');
@@ -209,6 +217,14 @@
         const articleAuthor = document.getElementById('articleAuthor');
         const articleContent = document.getElementById('articleContent');
         const articleDate = document.getElementById('articleDate');
+
+        // Load API Key from LocalStorage on Startup
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('gemini_api_key_gunungsari');
+            if (savedKey) {
+                apiKeyInput.value = savedKey;
+            }
+        });
 
         // Toggle Image Source Input
         imgSourceRadios.forEach(radio => {
@@ -239,14 +255,21 @@
 
         // Generate Button Click
         generateBtn.addEventListener('click', async () => {
-            const currentApiKey = 'AQ.Ab8RN6IT0n4TUtEDCS-7THSd0Rua-nxnPR5AiavPrQ-q1xhMzw';
+            const currentApiKey = apiKeyInput.value.trim();
             const keywords = keywordsInput.value.trim();
             const tone = toneSelect.value;
 
+            if (!currentApiKey) {
+                showAlert('Mohon masukkan Kunci API Gemini.');
+                return;
+            }
             if (!keywords) {
                 showAlert('Mohon masukkan kata kunci atau topik berita.');
                 return;
             }
+
+            // Simpan API Key ke localStorage
+            localStorage.setItem('gemini_api_key_gunungsari', currentApiKey);
 
             hideAlert();
             setLoading(true);
@@ -343,24 +366,11 @@
         }
 
         async function generateArticle(keywords, tone, base64Data, mimeType, apiKey) {
-            // Memanfaatkan Gemini Multimodal
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+            // Menggunakan Gemini 1.5 Flash sesuai instruksi
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
             
-            // Build Prompt
-            let promptText = `Anda adalah petugas Hubungan Masyarakat (Humas) profesional untuk Pemerintah Desa Gunungsari, Kecamatan Cikatomas, Kabupaten Tasikmalaya (https://gunungsari-tasikmalaya.desa.id/). Tugas Anda adalah menulis "Berita Pers" (Press Release) resmi berdasarkan standar jurnalistik 5W1H (What, Who, Where, When, Why, How).
-Gunakan bahasa Indonesia yang sangat formal, berwibawa, dan profesional ala rilis media instansi pemerintah.
-Gaya penulisan: ${tone}.
-Topik / Kata kunci dari pengguna: ${keywords}.
-Jika ada gambar terlampir, analisis gambar tersebut secara seksama dan jadikan informasi visualnya sebagai pelengkap atau fokus utama rilis pers agar lebih akurat.
-
-Instruksi Wajib:
-1. Buat "judul" berita pers yang tegas, resmi, dan relevan dengan topik.
-2. Buat "ringkasan" rilis sebagai sub-judul singkat.
-3. Tetapkan "penulis" sebagai "Humas Desa Gunungsari".
-4. Tetapkan "tanggal" dengan format lokal hari ini.
-5. Buat "konten" berisi susunan paragraf rilis pers (minimal 3 paragraf). Pastikan mencakup elemen 5W1H secara rapi. Berikan informasi pelengkap yang relevan mengenai program, kebijakan, atau kondisi di Desa Gunungsari agar rilis terasa nyata, komprehensif, dan kredibel.
-
-Kembalikan hasil HANYA menggunakan format JSON struktur berikut.`;
+            // Build Prompt presisi
+            let promptText = `Anda adalah Humas/Jurnalis Profesional Desa Gunungsari, Kecamatan Cikatomas, Kabupaten Tasikmalaya. Buat siaran pers resmi berstandar 5W1H dari kata kunci: ${keywords}. Gaya bahasa: ${tone}. Kembalikan HANYA dalam format JSON persis seperti ini: {"judul": "Judul...", "ringkasan": "Ringkasan...", "penulis": "Humas Desa Gunungsari", "tanggal": "Tanggal hari ini", "konten": ["Paragraf 1...", "Paragraf 2...", "Paragraf 3..."]}. Jangan beri markdown \`\`\`json.`;
 
             // Setup Payload Content (Multimodal if image exists)
             let parts = [{ text: promptText }];
@@ -376,22 +386,7 @@ Kembalikan hasil HANYA menggunakan format JSON struktur berikut.`;
             const payload = {
                 contents: [{ role: "user", parts: parts }],
                 generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: {
-                            judul: { type: "STRING" },
-                            ringkasan: { type: "STRING" },
-                            penulis: { type: "STRING" },
-                            tanggal: { type: "STRING" },
-                            konten: { 
-                                type: "ARRAY", 
-                                items: { type: "STRING" },
-                                description: "Array string di mana setiap item adalah satu paragraf dari isi berita."
-                            }
-                        },
-                        required: ["judul", "ringkasan", "penulis", "tanggal", "konten"]
-                    }
+                    responseMimeType: "application/json"
                 }
             };
 
@@ -402,12 +397,20 @@ Kembalikan hasil HANYA menggunakan format JSON struktur berikut.`;
             });
 
             if (result.candidates && result.candidates.length > 0) {
-                const textResponse = result.candidates[0].content.parts[0].text;
+                let textResponse = result.candidates[0].content.parts[0].text;
                 try {
+                    // Bersihkan jika AI membandel masih mengirimkan markdown
+                    textResponse = textResponse.trim();
+                    if (textResponse.startsWith('```json')) {
+                        textResponse = textResponse.replace(/^```json\n/, '').replace(/\n```$/, '');
+                    } else if (textResponse.startsWith('```')) {
+                        textResponse = textResponse.replace(/^```\n/, '').replace(/\n```$/, '');
+                    }
+                    
                     return JSON.parse(textResponse);
                 } catch (e) {
                     console.error("Failed to parse JSON response:", textResponse);
-                    throw new Error("Format JSON tidak valid");
+                    throw new Error("Format JSON tidak valid dari server AI.");
                 }
             } else {
                 throw new Error("Tidak ada output yang dihasilkan.");
