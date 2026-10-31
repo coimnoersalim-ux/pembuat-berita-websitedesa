@@ -64,9 +64,8 @@
 
             <!-- API Key Input -->
             <div>
-                <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-1">Kunci API Gemini</label>
-                <input type="password" id="apiKey" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all" placeholder="AIzaSy...">
-                <p class="text-xs text-gray-500 mt-1">Tersimpan otomatis di browser (localStorage).</p>
+                <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-1">Kunci API Gemini (Manual)</label>
+                <input type="text" id="apiKey" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all" placeholder="Masukkan Kunci API Anda...">
             </div>
 
             <!-- Keywords Input -->
@@ -206,12 +205,6 @@
         const articleContent = document.getElementById('articleContent');
         const articleDate = document.getElementById('articleDate');
 
-        // Init: Load API Key from localStorage
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedKey = localStorage.getItem('gemini_api_key_gunungsari');
-            if (savedKey) apiKeyInput.value = savedKey;
-        });
-
         // Toggle Image Source UI
         imgSourceRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
@@ -271,9 +264,6 @@
             if (!apiKey) return showError('Gagal: Kunci API Gemini tidak boleh kosong.');
             if (!keywords) return showError('Gagal: Kata kunci atau topik berita harus diisi.');
 
-            // Simpan API Key ke localStorage
-            localStorage.setItem('gemini_api_key_gunungsari', apiKey);
-
             setLoading(true);
 
             try {
@@ -292,22 +282,16 @@
                 }
 
                 // Susun Prompt Sistem
-                const promptText = `Anda adalah Humas/Jurnalis Profesional dari Desa Gunungsari.
-Tugas Anda: Buat berita atau siaran pers berstandar jurnalistik berdasarkan kata kunci berikut: "${keywords}".
-Gaya bahasa yang digunakan: ${tone}.
-
-Syarat Wajib:
-1. Kembalikan HANYA format JSON murni.
-2. Jangan gunakan awalan markdown seperti \`\`\`json atau akhiran \`\`\`. 
-3. Gunakan struktur JSON persis seperti ini:
+                const promptText = `Anda adalah Humas Desa Gunungsari. Buatlah artikel berita press release berdasarkan topik berikut: "${keywords}".
+Gunakan prinsip 5W1H. Gaya bahasa: ${tone}. Penulis default adalah 'Nursalim (Kasipem Desa Gunungsari)'.
+Kembalikan HANYA dalam format JSON murni tanpa markdown, dengan properti:
 {
-  "judul": "Judul Berita (Maksimal 10 Kata)",
-  "ringkasan": "Ringkasan padat satu kalimat",
-  "penulis": "Nama/Jabatan Penulis",
-  "tanggal": "Contoh: 31 Oktober 2026",
+  "judul": "string (Judul berita)",
+  "ringkasan": "string (Ringkasan padat satu kalimat)",
+  "penulis": "string (Nama/Jabatan Penulis)",
+  "tanggal": "string (Contoh format lokal, misal: 31 Oktober 2026)",
   "konten": ["<p>Paragraf pertama...</p>", "<p>Paragraf kedua...</p>"]
-}
-Catatan: 'konten' adalah array of strings di mana setiap elemen adalah satu paragraf yang sudah dibungkus tag HTML <p>.`;
+}`;
 
                 // Setup Payload
                 let parts = [{ text: promptText }];
@@ -325,8 +309,8 @@ Catatan: 'konten' adalah array of strings di mana setiap elemen adalah satu para
                     }
                 };
 
-                // Fetch ke API Gemini 1.5 Pro
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
+                // Fetch ke API Gemini 1.5 Flash
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
                 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
