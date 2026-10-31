@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Desa - Generator Berita Desa Gunungsari dengan AI</title>
+    <title>Portal Berita Desa Gunungsari</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+            background-color: #f0fdf4; /* Light green background */
         }
         .font-serif {
             font-family: 'Merriweather', serif;
@@ -18,14 +18,14 @@
         
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        ::-webkit-scrollbar-track { background: #dcfce7; }
+        ::-webkit-scrollbar-thumb { background: #86efac; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4ade80; }
 
         .loader {
-            border: 3px solid #f3f3f3;
+            border: 3px solid #dcfce7;
             border-radius: 50%;
-            border-top: 3px solid #ca8a04; /* Yellow to match theme */
+            border-top: 3px solid #16a34a; 
             width: 20px;
             height: 20px;
             -webkit-animation: spin 1s linear infinite;
@@ -39,18 +39,18 @@
 </head>
 <body class="h-screen flex flex-col md:flex-row overflow-hidden text-gray-800">
 
-    <!-- Sisi Kiri (Form) -->
-    <aside class="w-full md:w-1/3 lg:w-96 bg-white shadow-xl flex flex-col z-10 h-full overflow-y-auto">
-        <div class="p-6 border-b border-gray-100 bg-green-700 text-white">
+    <!-- Sisi Kiri (Form Input) -->
+    <aside class="w-full md:w-1/3 lg:w-96 bg-white shadow-2xl flex flex-col z-10 h-full overflow-y-auto border-r border-green-100">
+        <div class="p-6 border-b border-green-100 bg-green-700 text-white">
             <h1 class="text-2xl font-bold flex items-center gap-2">
-                <i class="ph ph-newspaper text-3xl"></i>
+                <i class="ph ph-leaf text-3xl text-green-300"></i>
                 Portal Desa
             </h1>
-            <p class="text-green-100 text-sm mt-1">Generator Berita Desa Gunungsari dengan AI.</p>
+            <p class="text-green-100 text-sm mt-1">Pembuat Berita Otomatis Desa Gunungsari.</p>
         </div>
 
         <div class="p-6 flex-1 flex flex-col gap-5">
-            <!-- Alert Box -->
+            <!-- Alert Box (Untuk Error) -->
             <div id="alertBox" class="hidden rounded-md bg-red-50 p-4 border border-red-200">
                 <div class="flex items-start">
                     <div class="flex-shrink-0">
@@ -62,35 +62,37 @@
                 </div>
             </div>
 
-            <!-- API Key Input -->
+            <!-- 1. Input Kunci API -->
             <div>
-                <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-1">Kunci API Gemini (Manual)</label>
-                <input type="text" id="apiKey" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all" placeholder="Masukkan Kunci API Anda...">
+                <label for="apiKey" class="block text-sm font-semibold text-gray-700 mb-1">Kunci API Gemini</label>
+                <input type="password" id="apiKey" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all" placeholder="Awali dengan AIza...">
+                <p class="text-xs text-gray-400 mt-1">Gunakan Kunci API yang valid dari Google AI Studio.</p>
             </div>
 
-            <!-- Model Selection -->
+            <!-- 2. Dropdown Model AI -->
             <div>
-                <label for="modelSelect" class="block text-sm font-medium text-gray-700 mb-1">Pilih Model AI</label>
+                <label for="modelSelect" class="block text-sm font-semibold text-gray-700 mb-1">Pilih Model AI</label>
                 <select id="modelSelect" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none bg-white">
-                    <option value="gemini-1.5-flash">gemini-1.5-flash (Direkomendasikan)</option>
-                    <option value="gemini-1.5-pro">gemini-1.5-pro (Lebih Cerdas)</option>
-                    <option value="gemini-pro">gemini-pro (Klasik)</option>
+                    <option value="gemini-1.5-pro">gemini-1.5-pro (Paling Cerdas)</option>
+                    <option value="gemini-1.5-flash">gemini-1.5-flash (Cepat)</option>
+                    <option value="gemini-pro">gemini-pro (Model Lama)</option>
                 </select>
+                <p class="text-xs text-gray-400 mt-1">Ganti model jika terjadi Error 404 (Not Found).</p>
             </div>
 
-            <!-- Keywords Input -->
+            <!-- 3. Textarea Topik -->
             <div>
-                <label for="keywords" class="block text-sm font-medium text-gray-700 mb-1">Kata Kunci atau Topik Berita</label>
-                <textarea id="keywords" rows="4" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none resize-none" placeholder="Contoh: Kegiatan rapat mingguan pemdes, gotong royong warga..."></textarea>
+                <label for="keywords" class="block text-sm font-semibold text-gray-700 mb-1">Kata Kunci / Topik Berita</label>
+                <textarea id="keywords" rows="4" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none resize-none" placeholder="Contoh: Rapat mingguan pemdes membahas ketahanan pangan desa..."></textarea>
             </div>
 
-            <!-- Image Source Selection -->
+            <!-- 4. Input Gambar -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Sumber Gambar (Opsional)</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Sumber Gambar Lampiran</label>
                 <div class="flex gap-4 mb-3">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="imgSource" value="upload" checked class="text-green-600 focus:ring-green-500 h-4 w-4">
-                        <span class="text-sm text-gray-700">Upload Foto</span>
+                        <span class="text-sm text-gray-700">Upload File</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="imgSource" value="url" class="text-green-600 focus:ring-green-500 h-4 w-4">
@@ -99,26 +101,18 @@
                 </div>
 
                 <div id="uploadWrapper">
-                    <input type="file" id="imageUpload" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-yellow-100 file:text-yellow-800 hover:file:bg-yellow-200 focus:outline-none cursor-pointer">
+                    <input type="file" id="imageUpload" accept="image/png, image/jpeg, image/webp, image/heic, image/heif" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-800 hover:file:bg-green-200 focus:outline-none cursor-pointer">
                 </div>
 
                 <div id="urlWrapper" class="hidden">
-                    <input type="text" id="imageUrl" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" placeholder="https://...">
+                    <input type="text" id="imageUrl" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" placeholder="https://contoh.com/gambar.jpg">
                 </div>
-            </div>
-            
-            <!-- Tone Selection -->
-            <div>
-                <label for="tone" class="block text-sm font-medium text-gray-700 mb-1">Gaya Bahasa Artikel</label>
-                <select id="tone" class="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none bg-white">
-                    <option value="Informatif & Profesional (Berita Pers)">Informatif & Profesional (Berita Pers)</option>
-                    <option value="Santai & Akrab (Kegiatan Warga)">Santai & Akrab (Kegiatan Warga)</option>
-                </select>
             </div>
         </div>
 
-        <div class="p-6 border-t border-gray-100 bg-gray-50">
-            <button id="generateBtn" class="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold py-3 px-4 rounded-lg shadow transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-75 disabled:cursor-not-allowed">
+        <!-- 5. Tombol Generate -->
+        <div class="p-6 border-t border-green-100 bg-green-50">
+            <button id="generateBtn" class="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-75 disabled:cursor-not-allowed">
                 <i class="ph ph-magic-wand text-xl" id="btnIcon"></i>
                 <div id="btnLoader" class="loader hidden"></div>
                 <span id="btnText">Buat Berita Otomatis</span>
@@ -126,61 +120,64 @@
         </div>
     </aside>
 
-    <!-- Sisi Kanan (Hasil Berita) -->
-    <main class="flex-1 h-full overflow-y-auto bg-gray-100 p-4 sm:p-8 lg:p-12 relative">
+    <!-- 6. Sisi Kanan (Hasil Berita) -->
+    <main class="flex-1 h-full overflow-y-auto bg-f0fdf4 p-4 sm:p-8 lg:p-12 relative flex items-center justify-center">
+        
         <!-- Placeholder Screen -->
-        <div id="welcomeScreen" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 transition-opacity duration-300">
-            <i class="ph ph-newspaper-clipping text-6xl mb-4 text-gray-300"></i>
-            <h2 class="text-xl font-medium text-gray-500">Hasil Berita Akan Muncul Di Sini</h2>
-            <p class="text-sm mt-2 text-center max-w-md px-4">Lengkapi form di sebelah kiri dan klik "Buat Berita Otomatis".</p>
+        <div id="welcomeScreen" class="flex flex-col items-center justify-center text-green-800/50 transition-opacity duration-300">
+            <i class="ph ph-newspaper-clipping text-6xl mb-4 text-green-300"></i>
+            <h2 class="text-xl font-medium text-green-700">Ruang Redaksi Desa</h2>
+            <p class="text-sm mt-2 text-center max-w-md px-4">Isi form di sebelah kiri untuk mulai menghasilkan artikel berita yang profesional.</p>
         </div>
 
         <!-- Article Container -->
-        <article id="articleContainer" class="hidden max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <!-- Image Header -->
+        <article id="articleContainer" class="hidden w-full max-w-3xl mx-auto bg-white rounded-xl shadow-lg border border-green-100 overflow-hidden self-start">
+            
+            <!-- Cover Image -->
             <div id="articleImageContainer" class="w-full h-64 sm:h-80 bg-gray-200 hidden relative">
                 <img id="articleImage" src="" alt="Cover Berita" class="w-full h-full object-cover">
                 <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                    <p class="text-yellow-400 text-xs font-bold uppercase tracking-wider">Desa Gunungsari</p>
+                    <p class="text-green-400 text-xs font-bold uppercase tracking-wider">Dokumentasi Desa Gunungsari</p>
                 </div>
             </div>
 
             <div class="p-6 sm:p-10">
-                <!-- Meta Info -->
-                <div class="flex items-center text-sm text-green-700 uppercase tracking-wide font-bold mb-4 gap-4">
+                <!-- Meta -->
+                <div class="flex items-center text-sm text-green-600 uppercase tracking-wide font-bold mb-4 gap-4">
                     <span id="articleDate">Tanggal</span>
                     <span class="text-gray-300">|</span>
-                    <span class="flex items-center gap-1 text-gray-500"><i class="ph ph-clock"></i> <span id="readTime">5 mnt baca</span></span>
+                    <span class="flex items-center gap-1 text-gray-500"><i class="ph ph-tag"></i> Berita Desa</span>
                 </div>
 
-                <!-- Headline -->
-                <h1 id="articleHeadline" class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4">
-                    Judul
+                <!-- Judul -->
+                <h1 id="articleHeadline" class="font-serif text-3xl sm:text-4xl font-bold text-gray-900 leading-tight mb-4">
+                    Judul Berita Akan Muncul Di Sini
                 </h1>
                 
-                <!-- Subheadline -->
-                <h2 id="articleSubheadline" class="text-lg sm:text-xl text-gray-600 font-medium leading-relaxed mb-6 pb-6 border-b border-gray-100">
-                    Ringkasan
+                <!-- Ringkasan -->
+                <h2 id="articleSubheadline" class="text-lg text-gray-600 font-medium leading-relaxed mb-6 pb-6 border-b border-gray-100 italic">
+                    Ringkasan berita...
                 </h2>
 
-                <!-- Author -->
+                <!-- Penulis -->
                 <div class="flex items-center gap-3 mb-8">
-                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-lg">
-                        <i class="ph ph-pen-nib"></i>
+                    <div class="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold text-lg">
+                        <i class="ph ph-user"></i>
                     </div>
                     <div>
-                        <p class="text-gray-900 font-bold text-sm" id="articleAuthor">Penulis</p>
-                        <p class="text-gray-500 text-xs">Jurnalis Desa</p>
+                        <p class="text-gray-900 font-bold text-sm">Penulis: <span id="articleAuthor">Nursalim (Kasipem)</span></p>
+                        <p class="text-gray-500 text-xs">Pemerintah Desa Gunungsari</p>
                     </div>
                 </div>
 
-                <!-- Content Body -->
+                <!-- Konten -->
                 <div id="articleContent" class="font-serif text-gray-800 text-lg leading-relaxed space-y-6">
-                    <!-- Paragraf HTML akan di-inject ke sini -->
+                    <!-- Paragraf di-inject via JS -->
                 </div>
                 
-                <div class="mt-12 pt-6 border-t border-gray-100 flex justify-between items-center">
-                    <p class="text-xs text-gray-400 italic">Dihasilkan secara otomatis oleh AI Portal Desa.</p>
+                <!-- Footer Article -->
+                <div class="mt-12 pt-6 border-t border-gray-100 flex justify-end items-center">
+                    <p class="text-xs text-gray-400 italic">Dicetak otomatis oleh AI Portal Desa Gunungsari.</p>
                 </div>
             </div>
         </article>
@@ -188,7 +185,7 @@
 
     <!-- JavaScript Logika -->
     <script>
-        // DOM Elements
+        // DOM Elements Initialization
         const apiKeyInput = document.getElementById('apiKey');
         const modelSelect = document.getElementById('modelSelect');
         const keywordsInput = document.getElementById('keywords');
@@ -197,7 +194,6 @@
         const urlWrapper = document.getElementById('urlWrapper');
         const imageUploadInput = document.getElementById('imageUpload');
         const imageUrlInput = document.getElementById('imageUrl');
-        const toneSelect = document.getElementById('tone');
         const generateBtn = document.getElementById('generateBtn');
         const btnText = document.getElementById('btnText');
         const btnIcon = document.getElementById('btnIcon');
@@ -212,11 +208,10 @@
         const articleImage = document.getElementById('articleImage');
         const articleHeadline = document.getElementById('articleHeadline');
         const articleSubheadline = document.getElementById('articleSubheadline');
-        const articleAuthor = document.getElementById('articleAuthor');
         const articleContent = document.getElementById('articleContent');
         const articleDate = document.getElementById('articleDate');
 
-        // Toggle Image Source UI
+        // Toggle Upload vs URL UI
         imgSourceRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 if(e.target.value === 'upload') {
@@ -229,17 +224,21 @@
             });
         });
 
-        // Helper: Convert File to Base64
+        // Convert File to Base64 (Hanya Datanya Saja)
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onload = () => {
+                    // Buang prefix "data:image/jpeg;base64,"
+                    const base64String = reader.result.split(',')[1];
+                    resolve(base64String);
+                };
                 reader.onerror = error => reject(error);
             });
         }
 
-        // Helper: Alert UI
+        // Tampilkan/Sembunyikan Pesan Error
         function showError(msg) {
             alertMessage.textContent = msg;
             alertBox.classList.remove('hidden');
@@ -248,11 +247,11 @@
             alertBox.classList.add('hidden');
         }
 
-        // Helper: Button Loading State
+        // Set Status Tombol (Loading)
         function setLoading(isLoading) {
             generateBtn.disabled = isLoading;
             if (isLoading) {
-                btnText.textContent = "Memproses...";
+                btnText.textContent = "Memproses Berita...";
                 btnIcon.classList.add('hidden');
                 btnLoader.classList.remove('hidden');
             } else {
@@ -262,68 +261,72 @@
             }
         }
 
-        // Main Logic: Generate Button Click
+        // Format Tanggal Hari Ini (Indonesia)
+        function getFormattedDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date().toLocaleDateString('id-ID', options);
+        }
+
+        // Eksekusi Pembuatan Berita
         generateBtn.addEventListener('click', async () => {
             hideError();
             
             const apiKey = apiKeyInput.value.trim();
             const keywords = keywordsInput.value.trim();
-            const tone = toneSelect.value;
+            const model = modelSelect.value;
             const sourceType = document.querySelector('input[name="imgSource"]:checked').value;
 
-            // Validasi Input
+            // Validasi Sederhana
             if (!apiKey) return showError('Gagal: Kunci API Gemini tidak boleh kosong.');
+            if (!apiKey.startsWith('AIza')) return showError('Gagal: Kunci API tidak valid. Harus diawali dengan "AIza".');
             if (!keywords) return showError('Gagal: Kata kunci atau topik berita harus diisi.');
 
             setLoading(true);
 
             try {
-                let finalImageUrl = "";
-                let base64Data = null;
-                let mimeType = null;
+                let displayImageUrl = ""; // Untuk ditampilkan di HTML
+                let parts = []; // Array konten untuk dikirim ke Gemini
 
-                // Tangani Gambar
+                // Sistem Prompt
+                const systemInstruction = `Anda adalah Jurnalis dan Humas Profesional Desa Gunungsari.
+Tugas Anda menulis Berita / Siaran Pers berdasarkan topik/kata kunci yang diberikan.
+Gunakan prinsip jurnalistik 5W1H. Gaya bahasa formal, informatif, dan positif.
+Anda HARUS mengembalikan HANYA format JSON mentah (tanpa blok markdown atau teks tambahan apa pun), dengan struktur tepat seperti ini:
+{
+  "judul": "Judul berita yang menarik",
+  "ringkasan": "Satu kalimat ringkasan padat dari berita",
+  "konten": "Isi berita paragraf 1.<br><br>Isi berita paragraf 2.<br><br>Isi berita paragraf 3..."
+}`;
+                
+                parts.push({ text: `${systemInstruction}\n\nTopik Berita: "${keywords}"\nTulis beritanya sekarang dalam JSON:` });
+
+                // Proses Gambar
                 if (sourceType === 'upload' && imageUploadInput.files.length > 0) {
                     const file = imageUploadInput.files[0];
-                    mimeType = file.type;
-                    base64Data = await fileToBase64(file);
-                    finalImageUrl = URL.createObjectURL(file); // Preview lokal
-                } else if (sourceType === 'url' && imageUrlInput.value.trim() !== '') {
-                    finalImageUrl = imageUrlInput.value.trim();
-                }
-
-                // Susun Prompt Sistem
-                const promptText = `Anda adalah Humas Desa Gunungsari. Buatlah artikel berita press release berdasarkan topik berikut: "${keywords}".
-Gunakan prinsip 5W1H. Gaya bahasa: ${tone}. Penulis default adalah 'Nursalim (Kasipem Desa Gunungsari)'.
-Kembalikan HANYA dalam format JSON murni tanpa markdown, dengan properti:
-{
-  "judul": "string (Judul berita)",
-  "ringkasan": "string (Ringkasan padat satu kalimat)",
-  "penulis": "string (Nama/Jabatan Penulis)",
-  "tanggal": "string (Contoh format lokal, misal: 31 Oktober 2026)",
-  "konten": ["<p>Paragraf pertama...</p>", "<p>Paragraf kedua...</p>"]
-}`;
-
-                // Setup Payload
-                let parts = [{ text: promptText }];
-                if (base64Data) {
+                    const mimeType = file.type;
+                    
+                    // Convert ke Base64 murni
+                    const base64Data = await fileToBase64(file);
+                    displayImageUrl = URL.createObjectURL(file); 
+                    
+                    // Tambahkan data gambar ke payload AI
                     parts.push({
                         inlineData: { mimeType: mimeType, data: base64Data }
                     });
+                } else if (sourceType === 'url' && imageUrlInput.value.trim() !== '') {
+                    displayImageUrl = imageUrlInput.value.trim();
+                    // Jika URL, berikan referensi URL ke teks agar AI tahu konteksnya
+                    parts[0].text += `\nReferensi URL Gambar: ${displayImageUrl}`;
                 }
 
+                // Siapkan Payload Request API
                 const payload = {
-                    contents: [{ role: "user", parts: parts }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        responseMimeType: "application/json" // Memaksa AI mengembalikan JSON
-                    }
+                    contents: [{ role: "user", parts: parts }]
+                    // Catatan: Tidak menggunakan responseMimeType agar aman di model gemini-pro (lama)
                 };
-
-                const selectedModel = modelSelect.value;
                 
-                // Fetch ke API Gemini secara dinamis
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
+                // Fetch ke API Gemini
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
                 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -333,7 +336,7 @@ Kembalikan HANYA dalam format JSON murni tanpa markdown, dengan properti:
 
                 const data = await response.json();
 
-                // Tangani Response Error dari Google
+                // Tangkap HTTP Error dari Google (termasuk 404 Model Not Found)
                 if (!response.ok) {
                     let errMsg = data.error?.message || response.statusText;
                     throw new Error(`API Error (${response.status}): ${errMsg}`);
@@ -342,23 +345,26 @@ Kembalikan HANYA dalam format JSON murni tanpa markdown, dengan properti:
                 if (data.candidates && data.candidates.length > 0) {
                     let textResponse = data.candidates[0].content.parts[0].text;
                     
-                    // Bersihkan backtick markdown jika AI tetap membandel
+                    // Bersihkan blok markdown (```json ... ```) dari respons
+                    textResponse = textResponse.replace(/^```json/im, '');
+                    textResponse = textResponse.replace(/^```/im, '');
+                    textResponse = textResponse.replace(/```$/im, '');
                     textResponse = textResponse.trim();
-                    textResponse = textResponse.replace(/^```json/i, '').replace(/^```/, '').replace(/```$/, '').trim();
 
-                    // Parse JSON
+                    // Parse String ke Object JSON
                     let articleData;
                     try {
                         articleData = JSON.parse(textResponse);
                     } catch (parseErr) {
-                        console.log("Raw Response:", textResponse);
-                        throw new Error("Gagal memproses JSON dari AI. Format tidak sesuai.");
+                        console.error("Raw AI Response:", textResponse);
+                        throw new Error("Gagal membaca data JSON dari AI. Format output AI tidak valid.");
                     }
 
-                    // Tampilkan Hasil
-                    renderArticle(articleData, finalImageUrl);
+                    // Render ke Tampilan
+                    renderArticle(articleData, displayImageUrl);
+
                 } else {
-                    throw new Error("AI tidak mengembalikan teks apapun.");
+                    throw new Error("Gemini tidak mengembalikan teks konten apa pun.");
                 }
 
             } catch (error) {
@@ -369,56 +375,26 @@ Kembalikan HANYA dalam format JSON murni tanpa markdown, dengan properti:
             }
         });
 
-        // Tampilkan data ke DOM (Sisi Kanan)
+        // Fungsi Render Data ke Tampilan Kanan
         function renderArticle(data, imageUrl) {
+            // Sembunyikan layar selamat datang, tampilkan kontainer berita
             welcomeScreen.classList.add('hidden');
             articleContainer.classList.remove('hidden');
 
-            articleHeadline.textContent = data.judul || "Tanpa Judul";
+            // Set Teks
+            articleHeadline.textContent = data.judul || "Judul Tidak Ditemukan";
             articleSubheadline.textContent = data.ringkasan || "";
-            articleAuthor.textContent = data.penulis || "Humas Desa Gunungsari";
-            articleDate.textContent = data.tanggal || new Date().toLocaleDateString('id-ID');
+            articleDate.textContent = getFormattedDate();
+            
+            // Set Konten (AI sudah diminta memakai <br><br>)
+            articleContent.innerHTML = data.konten || "<p>Tidak ada konten.</p>";
 
-            // Susun Konten (Data sudah berupa array of string dgn tag HTML <p>)
-            articleContent.innerHTML = "";
-            let textLength = 0;
-
-            if(Array.isArray(data.konten)) {
-                data.konten.forEach((paragraph, index) => {
-                    // Jika AI tidak memberikan tag <p>, bungkus otomatis
-                    if (!paragraph.trim().startsWith('<p>')) {
-                        paragraph = `<p>${paragraph}</p>`;
-                    }
-                    
-                    // Drop cap untuk estetika di paragraf pertama
-                    if (index === 0) {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = paragraph;
-                        let firstText = tempDiv.textContent || tempDiv.innerText || "";
-                        if (firstText.length > 0) {
-                            const firstChar = firstText.charAt(0);
-                            const restOfText = tempDiv.innerHTML.substring(1); // Cukup aman jika tidak ada tag kompleks di awal
-                            paragraph = `<p><span class="float-left text-5xl font-bold leading-none pr-2 pt-1 text-green-800">${firstChar}</span>${restOfText}</p>`;
-                        }
-                    }
-                    
-                    articleContent.innerHTML += paragraph;
-                    textLength += paragraph.split(' ').length;
-                });
-            } else if (typeof data.konten === 'string') {
-                articleContent.innerHTML = data.konten;
-                textLength += data.konten.split(' ').length;
-            }
-
-            // Estimasi waktu baca
-            const minutes = Math.max(1, Math.ceil(textLength / 200));
-            document.getElementById('readTime').textContent = `${minutes} mnt baca`;
-
-            // Tangani Gambar Cover
+            // Set Gambar Cover
             if (imageUrl) {
                 articleImage.src = imageUrl;
                 articleImageContainer.classList.remove('hidden');
                 
+                // Jika gambar URL gagal diload
                 articleImage.onerror = () => {
                     articleImageContainer.classList.add('hidden');
                 };
@@ -426,7 +402,7 @@ Kembalikan HANYA dalam format JSON murni tanpa markdown, dengan properti:
                 articleImageContainer.classList.add('hidden');
             }
 
-            // Scroll otomatis ke atas
+            // Animasi scroll ke atas
             document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
