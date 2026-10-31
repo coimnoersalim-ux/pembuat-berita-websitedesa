@@ -71,6 +71,13 @@
                 </div>
             </div>
 
+            <!-- API Key Input -->
+            <div>
+                <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-2">API Key Gemini</label>
+                <input type="password" id="apiKey" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none" placeholder="Masukkan API Key Anda...">
+                <p class="text-xs text-gray-500 mt-1">Dapatkan kunci API dari Google AI Studio.</p>
+            </div>
+
             <!-- Keywords Input -->
             <div>
                 <label for="keywords" class="block text-sm font-medium text-gray-700 mb-2">Kata Kunci atau Topik Berita</label>
@@ -185,9 +192,8 @@
     </main>
 
     <script>
-        const apiKey = ""; // Canvas menyediakan ini otomatis
-
         // --- DOM Elements ---
+        const apiKeyInput = document.getElementById('apiKey');
         const keywordsInput = document.getElementById('keywords');
         const imageUrlInput = document.getElementById('imageUrl');
         const imageUploadInput = document.getElementById('imageUpload');
@@ -241,9 +247,15 @@
 
         // Generate Button Click
         generateBtn.addEventListener('click', async () => {
+            const currentApiKey = apiKeyInput.value.trim();
             const keywords = keywordsInput.value.trim();
             const tone = toneSelect.value;
             
+            if (!currentApiKey) {
+                showAlert('Mohon masukkan API Key Gemini.');
+                return;
+            }
+
             if (!keywords) {
                 showAlert('Mohon masukkan kata kunci atau topik berita.');
                 return;
@@ -268,13 +280,13 @@
                     finalImageUrl = imageUrlInput.value.trim();
                 }
 
-                const articleData = await generateArticle(keywords, tone, base64Data, mimeType);
+                const articleData = await generateArticle(keywords, tone, base64Data, mimeType, currentApiKey);
                 if (articleData) {
                     displayArticle(articleData, finalImageUrl);
                 }
             } catch (error) {
                 console.error("Generation Error:", error);
-                showAlert('Gagal membuat berita. Silakan periksa kembali jaringan Anda atau coba lagi nanti.');
+                showAlert(`Gagal: ${error.message}`);
             } finally {
                 setLoading(false);
             }
@@ -309,22 +321,41 @@
                 try {
                     const response = await fetch(url, options);
                     if (!response.ok) {
-                        if (response.status === 429) {
-                            throw new Error('Rate limited');
+                        let errorMsg = `HTTP error! status: ${response.status}`;
+                        try {
+                            // Coba ekstrak pesan error dari JSON balasan Gemini API
+                            const errData = await response.json();
+                            if (errData && errData.error && errData.error.message) {
+                                errorMsg = errData.error.message;
+                            }
+                        } catch(e) {
+                            // Abaikan jika respons bukan JSON
                         }
-                        throw new Error(`HTTP error! status: ${response.status}`);
+
+                        if (response.status === 429) {
+                            throw new Error('Terlalu banyak permintaan (Rate limited). Tunggu beberapa saat lalu coba lagi.');
+                        } else if (response.status === 400) {
+                            throw new Error(`Permintaan tidak valid (400): ${errorMsg}`);
+                        } else if (response.status === 403) {
+                            throw new Error(`Akses ditolak (403). Periksa kembali API Key Anda. Detail: ${errorMsg}`);
+                        }
+                        
+                        throw new Error(errorMsg);
                     }
                     return await response.json();
                 } catch (error) {
                     retries++;
-                    if (retries >= maxRetries) throw error;
+                    // Jangan retry untuk error autentikasi (403) atau bad request (400)
+                    if (retries >= maxRetries || error.message.includes('Akses ditolak') || error.message.includes('Permintaan tidak valid')) {
+                        throw error;
+                    }
                     const delay = Math.pow(2, retries - 1) * 1000;
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
         }
 
-        async function generateArticle(keywords, tone, base64Data, mimeType) {
+        async function generateArticle(keywords, tone, base64Data, mimeType, apiKey) {
             // Memanfaatkan Gemini Multimodal
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
             
